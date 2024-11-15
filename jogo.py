@@ -23,9 +23,9 @@ fonte_rb = pg.font.SysFont("comicsansms", 40)
 fonte_menor = pg.font.SysFont("comicsansms", 25)
 fonte_conjuntos = pg.font.SysFont("comicsansms", 18)
 
-A = ['CRUZEIRO', 'INTERNACIONAL', 'ATLETICO MINEIRO', 'VASCO DA GAMA', 'FLAMENGO']
-B = ['GREMIO', 'SAO PAULO', 'VASCO DA GAMA', 'CORINTHIANS', 'SANTOS']
-C = ['CORINTHIANS', 'SÃO PAULO', 'CRUZEIRO', 'VASCO DA GAMA']
+A = ['ATLETICO MINEIRO', 'CRUZEIRO', 'FLAMENGO', 'INTERNACIONAL', 'VASCO DA GAMA']
+B = ['CORINTHIANS', 'GREMIO', 'PALMEIRAS', 'SANTOS', 'SAO PAULO', 'VASCO DA GAMA']
+C = ['CORINTHIANS', 'CRUZEIRO', 'SÃO PAULO', 'VASCO DA GAMA']
 
 tentativas_de_letras = ['', '-']
 palavra_escolhida = ''
@@ -192,15 +192,6 @@ def Desenho_Restart_Button(window):
     pos_y = (100 + 65 / 2) - altura_texto / 2
     window.blit(texto, (pos_x, pos_y))
 
-def Restart_do_Jogo(end_game, chance, tentativas_de_letras, click_last_status, click, x, y):
-    global pergunta, palavra_escolhida
-    if 700 <= x <= 900 and 100 <= y <= 165 and not click_last_status and click[0]:
-        tentativas_de_letras = []
-        end_game = True
-        chance = 0
-        pergunta, palavra_escolhida = Sorteando_Palavra()
-    return end_game, chance, tentativas_de_letras
-
 def quebrar_texto(texto, largura_maxima, fonte):
     palavras = texto.split(' ')
     linhas = []
@@ -276,12 +267,25 @@ def Desenho_Conjuntos(window, A, B, C):
         espacamento_final = pos_y_final - (pos_y_offset + (total_linhas_C * gap_between_lines))
         pos_y_offset += espacamento_final
 
-def Sorteando_Palavra(times, end_game):
-    if end_game:
-        palavra_escolhida = random.choice(times)
-        end_game = False
-        return palavra_escolhida, end_game
-    return '', end_game
+def Gerar_Pergunta():
+    perguntas = [
+        ("O time x pertence a A e B", list(set(A) & set(B))),
+        ("O time x pertence a A mas não a B", list(set(A) - set(B))),
+        ("O time x pertence a B mas não a A", list(set(B) - set(A))),
+        ("O time x pertence a A e C", list(set(A) & set(C))),
+        ("O time x pertence a A, B e C", list(set(A) & set(B) & set(C))),
+        ("O time x pertence a B mas não a C", list(set(B) - set(C))),
+        ("O time x não pertence a A", list((set(B) | set(C)) - set(A))),
+        ("O time x não pertence a B", list((set(A) | set(C)) - set(B))),
+        ("O time x não pertence a A nem a B", list(set(C) - set(A) - set(B))),
+        ("O time x não pertence a B nem a C", list(set(A) - set(B) - set(C))),
+    ]
+    
+    pergunta, resposta = random.choice(perguntas)
+    
+    palavra_escolhida = random.choice(resposta)
+    
+    return pergunta, palavra_escolhida
 
 def Camuflando_Palavra(palavra_escolhida, tentativas_de_letras):
     palavra_camuflada = ''
@@ -303,12 +307,15 @@ def Palavra_do_Jogo(window, palavra_camuflada):
     palavra = fonte_rb.render(palavra_camuflada, True, preto)
     window.blit(palavra, (30, 460))
 
-def Restart_do_Jogo(end_game, chance, tentativas_de_letras, click_last_status, click, x, y):
+pergunta_gerada = False
+
+def Restart_do_Jogo(end_game, chance, tentativas_de_letras, click_last_status, click, x, y, pergunta_gerada):
     if 700 <= x <= 900 and 100 <= y <= 165 and not click_last_status and click[0]:
         tentativas_de_letras = [' ', '-']
         end_game = True
         chance = 0
-    return end_game, chance, tentativas_de_letras
+        pergunta_gerada = False
+    return end_game, chance, tentativas_de_letras, pergunta_gerada
 
 def Desenho_Letras_Tentadas(window, tentativas_de_letras):
     letras = 'Letras tentadas: ' + ', '.join(tentativas_de_letras)
@@ -333,8 +340,11 @@ while True:
 
         if 350 <= x <= 650 and 250 <= y <= 325 and click[0] and not click_last_status:
             jogo_iniciado = True
-            palavra_escolhida, end_game = Sorteando_Palavra(A, end_game)
+            pergunta, palavra_escolhida = Gerar_Pergunta()
+            pergunta_gerada = True
             tentativas_de_letras = [' ', '-']
+            chance = 0
+            end_game = False
 
         Verificar_Botao_Sair(x, y, click, click_last_status)
         
@@ -346,18 +356,22 @@ while True:
         Mostrar_Pergunta(window, pergunta)
 
         if end_game:
-            palavra_escolhida, end_game = Sorteando_Palavra(A, end_game)
-            tentativas_de_letras = [' ', '-']
+            if not pergunta_gerada:
+                pergunta, palavra_escolhida = Gerar_Pergunta()
+                pergunta_gerada = True
+                tentativas_de_letras = [' ', '-']
+                chance = 0
+                end_game = False
 
         palavra_camuflada = Camuflando_Palavra(palavra_escolhida, tentativas_de_letras)
         Palavra_do_Jogo(window, palavra_camuflada)
 
         Desenho_Conjuntos(window, 
-                         ['CRUZEIRO', 'INTERNACIONAL', 'ATLETICO MINEIRO', 'VASCO DA GAMA', 'FLAMENGO'],
-                         ['GREMIO', 'SAO PAULO', 'VASCO DA GAMA', 'CORINTHIANS', 'SANTOS'],
-                         ['CORINTHIANS', 'SÃO PAULO', 'CRUZEIRO', 'VASCO DA GAMA'])
+                        ['ATLETICO MINEIRO', 'CRUZEIRO', 'FLAMENGO', 'INTERNACIONAL', 'VASCO DA GAMA'],
+                        ['CORINTHIANS', 'GREMIO', 'PALMEIRAS', 'SANTOS', 'SAO PAULO', 'VASCO DA GAMA'],
+                        ['CORINTHIANS', 'CRUZEIRO', 'SÃO PAULO', 'VASCO DA GAMA'])
 
-        end_game, chance, tentativas_de_letras = Restart_do_Jogo(end_game, chance, tentativas_de_letras, click_last_status, click, x, y)
+        end_game, chance, tentativas_de_letras, pergunta_gerada = Restart_do_Jogo(end_game, chance, tentativas_de_letras, click_last_status, click, x, y, pergunta_gerada)
 
         jogo_iniciado = Voltar_Ao_Menu(x, y, click, click_last_status, jogo_iniciado)
 
