@@ -6,6 +6,8 @@ preto = (0, 0, 0)
 verde = (34, 177, 76)
 amarelo = (255, 223, 0)
 vermelho = (255, 0, 0)
+cinza_claro = (128, 128, 128)
+cinza_escuro = (88, 88, 88)
 
 pg.init()
 window = pg.display.set_mode((1000, 600))
@@ -144,6 +146,24 @@ def Desenho_Restart_Button(window):
     texto = fonte_rb.render('Restart', True, branco)
     window.blit(texto, (740, 120))
 
+def Desenho_Voltar_Menu_Button(window):
+    pg.draw.rect(window, cinza_claro, (700, 175, 200, 65))
+    pg.draw.rect(window, cinza_escuro, (700, 175, 200, 65), 5)
+
+    texto_voltar_menu = fonte_rb.render("Voltar", True, branco)
+    
+    largura_texto_voltar = texto_voltar_menu.get_width()
+    altura_texto_voltar = texto_voltar_menu.get_height()
+    pos_x_voltar = (700 + 200 / 2) - largura_texto_voltar / 2
+    pos_y_voltar = (175 + 65 / 2) - altura_texto_voltar / 2
+
+    window.blit(texto_voltar_menu, (pos_x_voltar, pos_y_voltar))
+
+def Voltar_Ao_Menu(x, y, click, click_last_status, jogo_iniciado):
+    if 700 <= x <= 900 and 175 <= y <= 240 and not click_last_status and click[0]:
+        jogo_iniciado = False
+    return jogo_iniciado
+
 def Sorteando_Palavra(times, end_game):
     if end_game:
         palavra_escolhida = random.choice(times)
@@ -204,6 +224,7 @@ while True:
     if jogo_iniciado:
         Desenho_da_Forca(window, chance)
         Desenho_Restart_Button(window)
+        Desenho_Voltar_Menu_Button(window)
 
         if end_game:
             palavra_escolhida, end_game = Sorteando_Palavra(A, end_game)
@@ -213,6 +234,8 @@ while True:
         Palavra_do_Jogo(window, palavra_camuflada)
 
         end_game, chance, tentativas_de_letras = Restart_do_Jogo(end_game, chance, tentativas_de_letras, click_last_status, click, x, y)
+
+        jogo_iniciado = Voltar_Ao_Menu(x, y, click, click_last_status, jogo_iniciado)
 
     click_last_status = click[0]
 
