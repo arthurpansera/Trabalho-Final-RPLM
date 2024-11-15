@@ -294,7 +294,7 @@ def Gerar_Pergunta():
         ("O time x pertence a A e C", list(set(A) & set(C))),
         ("O time x pertence a A, B e C", list(set(A) & set(B) & set(C))),
         ("O time x pertence a B mas não a C", list(set(B) - set(C))),
-        ("O time x não pertence a A", list((set(B) | set(C)) - set(A))),
+        ("O time x pertence a B ou C, mas não a A", list((set(B) | set(C)) - set(A))),
         ("O time x não pertence a B", list((set(A) | set(C)) - set(B))),
         ("O time x não pertence a A nem a B", list(set(C) - set(A) - set(B))),
         ("O time x não pertence a B nem a C", list(set(A) - set(B) - set(C))),
