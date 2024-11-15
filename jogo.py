@@ -1,6 +1,7 @@
 import pygame as pg
 import random
 
+# Definindo cores como tuplas de RGB
 branco = (255, 255, 255)
 preto = (0, 0, 0)
 verde = (34, 177, 76)
@@ -10,23 +11,30 @@ vermelho_escuro = (200, 0, 0)
 cinza_claro = (128, 128, 128)
 cinza_escuro = (88, 88, 88)
 
+# Inicializa o Pygame
 pg.init()
+
+# Configurações da janela do jogo
 window = pg.display.set_mode((1000, 600))
 pg.display.set_caption("Jogo da Forca - Times de Futebol")
 pg.font.init()
 
+# Carregando o ícone da janela
 icone = pg.image.load("imagens/icone.jpg")
 pg.display.set_icon(icone)
 
+# Definição de fontes para títulos, botões e textos
 fonte_titulo = pg.font.SysFont("impact", 60)
 fonte_rb = pg.font.SysFont("comicsansms", 40)
 fonte_menor = pg.font.SysFont("comicsansms", 25)
 fonte_conjuntos = pg.font.SysFont("comicsansms", 18)
 
+# Listas de times de futebol que serão usadas nas perguntas
 A = ['ATLETICO MINEIRO', 'CRUZEIRO', 'FLAMENGO', 'INTERNACIONAL', 'VASCO DA GAMA']
 B = ['CORINTHIANS', 'GREMIO', 'PALMEIRAS', 'SANTOS', 'SAO PAULO', 'VASCO DA GAMA']
 C = ['CORINTHIANS', 'CRUZEIRO', 'SANTOS', 'SAO PAULO', 'VASCO DA GAMA']
 
+# Variáveis para controle do jogo
 tentativas_de_letras = ['', '-']
 palavra_escolhida = ''
 palavra_camuflada = ''
@@ -38,6 +46,7 @@ jogo_iniciado = False
 pergunta = ''
 conjuntos_exibidos = False
 
+# Função para desenhar o botão de sair
 def Desenho_Sair_Button(window):
     pg.draw.rect(window, vermelho, (350, 350, 300, 75))
     pg.draw.rect(window, amarelo, (350, 350, 300, 75), 5)
@@ -50,12 +59,14 @@ def Desenho_Sair_Button(window):
 
     window.blit(texto_sair, (pos_x, pos_y))
 
+# Função para verificar o clique no botão de sair
 def Verificar_Botao_Sair(x, y, click, click_last_status):
     if 350 <= x <= 650 and 350 <= y <= 425:
         if click[0] and not click_last_status:
             pg.quit()
             exit()
 
+# Função para desenhar a tela inicial do jogo
 def Desenho_Tela_Inicial(window):
     imagem_fundo = pg.image.load('imagens/bola.jpg')
     imagem_fundo = pg.transform.scale(imagem_fundo, (1000, 600))
@@ -123,6 +134,7 @@ def Desenho_Tela_Inicial(window):
         window.blit(texto_creditos_renderizado, (pos_x_creditos, pos_y_creditos))
         pos_y_creditos += fonte_creditos.get_height() + 5
 
+# Função para desenhar a forca
 def Desenho_da_Forca(window, chance):
     imagem_fundo = pg.image.load('imagens/estadio.jpeg')
     imagem_fundo = pg.transform.scale(imagem_fundo, (1000, 600))
@@ -159,6 +171,7 @@ def Desenho_da_Forca(window, chance):
     if chance >= 5: pg.draw.line(window, preto, (x_base + comprimento_barra, y_base + 250), (x_base + comprimento_barra + 60, y_base + 320), tamanho_linhas)
     if chance >= 6: pg.draw.line(window, preto, (x_base + comprimento_barra, y_base + 250), (x_base + comprimento_barra - 60, y_base + 320), tamanho_linhas)
 
+# Função para desenhar o botão de voltar ao menu
 def Desenho_Voltar_Menu_Button(window):
     pg.draw.rect(window, cinza_claro, (700, 175, 200, 65))
     pg.draw.rect(window, cinza_escuro, (700, 175, 200, 65), 5)
@@ -172,15 +185,18 @@ def Desenho_Voltar_Menu_Button(window):
 
     window.blit(texto_voltar_menu, (pos_x_voltar, pos_y_voltar))
 
+# Função para verificar o clique no botão de voltar ao menu
 def Voltar_Ao_Menu(x, y, click, click_last_status, jogo_iniciado):
     if 700 <= x <= 900 and 175 <= y <= 240 and not click_last_status and click[0]:
         jogo_iniciado = False
     return jogo_iniciado
 
+# Função para mostrar as perguntas
 def Mostrar_Pergunta(window, pergunta):
     texto_pergunta = fonte_rb.render(pergunta, True, preto)
     window.blit(texto_pergunta, (20, 20))
 
+# Função para desenhar o botão de restart
 def Desenho_Restart_Button(window):
     pg.draw.rect(window, vermelho, (700, 100, 200, 65))
     pg.draw.rect(window, vermelho_escuro, (700, 100, 200, 65), 5)
@@ -192,6 +208,7 @@ def Desenho_Restart_Button(window):
     pos_y = (100 + 65 / 2) - altura_texto / 2
     window.blit(texto, (pos_x, pos_y))
 
+# Função para quebrar o texto, evitando que ultrapasse o tamanho da janela
 def quebrar_texto(texto, largura_maxima, fonte):
     palavras = texto.split(' ')
     linhas = []
@@ -209,6 +226,7 @@ def quebrar_texto(texto, largura_maxima, fonte):
     
     return linhas
 
+# Função para desenhar os conjuntos
 def Desenho_Conjuntos(window, A, B, C):
     conjunto_box_width = 390
     conjunto_box_height = 240
@@ -267,6 +285,7 @@ def Desenho_Conjuntos(window, A, B, C):
         espacamento_final = pos_y_final - (pos_y_offset + (total_linhas_C * gap_between_lines))
         pos_y_offset += espacamento_final
 
+# Função para gerar as perguntas e respostas
 def Gerar_Pergunta():
     perguntas = [
         ("O time x pertence a A e B", list(set(A) & set(B))),
@@ -290,6 +309,7 @@ def Gerar_Pergunta():
 
     return pergunta, palavra_escolhida
 
+# Função para camuflar a resposta
 def Camuflando_Palavra(palavra_escolhida, tentativas_de_letras):
     palavra_camuflada = ''
     for letra in palavra_escolhida:
@@ -299,6 +319,7 @@ def Camuflando_Palavra(palavra_escolhida, tentativas_de_letras):
             palavra_camuflada += '#'
     return palavra_camuflada
 
+# Função para verificar se uma letra está na resposta
 def Tentando_uma_Letra(tentativas_de_letras, palavra_escolhida, letra, chance):
     if letra.isalpha() and letra not in tentativas_de_letras:
         tentativas_de_letras.append(letra)
@@ -306,12 +327,14 @@ def Tentando_uma_Letra(tentativas_de_letras, palavra_escolhida, letra, chance):
             chance += 1
     return tentativas_de_letras, chance
 
+# Função para desenhar a palavra camuflada
 def Palavra_do_Jogo(window, palavra_camuflada):
     palavra = fonte_rb.render(palavra_camuflada, True, preto)
     window.blit(palavra, (30, 460))
 
 pergunta_gerada = False
 
+# Função para recomeçar o jogo
 def Restart_do_Jogo(end_game, chance, tentativas_de_letras, click_last_status, click, x, y, pergunta_gerada):
     if 700 <= x <= 900 and 100 <= y <= 165 and not click_last_status and click[0]:
         tentativas_de_letras = [' ', '-']
@@ -320,12 +343,14 @@ def Restart_do_Jogo(end_game, chance, tentativas_de_letras, click_last_status, c
         pergunta_gerada = False
     return end_game, chance, tentativas_de_letras, pergunta_gerada
 
+# Função para desenhar as letras tentadas
 def Desenho_Letras_Tentadas(window, tentativas_de_letras):
     tentativas_filtradas = [letra for letra in tentativas_de_letras if letra not in [' ', '-']]
     letras = 'Letras tentadas: ' + ', '.join(tentativas_filtradas)
     texto_tentativas = fonte_menor.render(letras, True, preto)
     window.blit(texto_tentativas, (20, 550))
 
+# Função para desenhar a tela de game over
 def Desenho_Tela_Game_Over(window, resposta, x, y, click, click_last_status):
     if resposta == 'CRUZEIRO':
         imagem_fundo = pg.image.load('imagens/cruzeiroperdeu.jpg')
@@ -397,6 +422,7 @@ def Desenho_Tela_Game_Over(window, resposta, x, y, click, click_last_status):
 
     return True, nova_rodada, voltar_menu
 
+# Função para desenhar a tela de vitória
 def Desenho_Tela_Vitoria(window, resposta, x, y, click, click_last_status):
     if resposta == 'CRUZEIRO':
         imagem_fundo = pg.image.load('imagens/cruzeiroganhou.jpg')
@@ -468,6 +494,7 @@ def Desenho_Tela_Vitoria(window, resposta, x, y, click, click_last_status):
 
     return True, nova_rodada, voltar_menu
 
+# Loop principal do jogo
 while True:
     for event in pg.event.get():
         if event.type == pg.QUIT:
