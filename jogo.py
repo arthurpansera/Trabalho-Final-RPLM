@@ -25,7 +25,7 @@ fonte_conjuntos = pg.font.SysFont("comicsansms", 18)
 
 A = ['ATLETICO MINEIRO', 'CRUZEIRO', 'FLAMENGO', 'INTERNACIONAL', 'VASCO DA GAMA']
 B = ['CORINTHIANS', 'GREMIO', 'PALMEIRAS', 'SANTOS', 'SAO PAULO', 'VASCO DA GAMA']
-C = ['CORINTHIANS', 'CRUZEIRO', 'SÃO PAULO', 'VASCO DA GAMA']
+C = ['CORINTHIANS', 'CRUZEIRO', 'SANTOS', 'SAO PAULO', 'VASCO DA GAMA']
 
 tentativas_de_letras = ['', '-']
 palavra_escolhida = ''
@@ -280,11 +280,14 @@ def Gerar_Pergunta():
         ("O time x não pertence a A nem a B", list(set(C) - set(A) - set(B))),
         ("O time x não pertence a B nem a C", list(set(A) - set(B) - set(C))),
     ]
-    
+
     pergunta, resposta = random.choice(perguntas)
-    
+
+    if not resposta:
+        return Gerar_Pergunta()
+
     palavra_escolhida = random.choice(resposta)
-    
+
     return pergunta, palavra_escolhida
 
 def Camuflando_Palavra(palavra_escolhida, tentativas_de_letras):
@@ -297,7 +300,7 @@ def Camuflando_Palavra(palavra_escolhida, tentativas_de_letras):
     return palavra_camuflada
 
 def Tentando_uma_Letra(tentativas_de_letras, palavra_escolhida, letra, chance):
-    if letra not in tentativas_de_letras:
+    if letra.isalpha() and letra not in tentativas_de_letras:
         tentativas_de_letras.append(letra)
         if letra not in palavra_escolhida:
             chance += 1
@@ -318,9 +321,152 @@ def Restart_do_Jogo(end_game, chance, tentativas_de_letras, click_last_status, c
     return end_game, chance, tentativas_de_letras, pergunta_gerada
 
 def Desenho_Letras_Tentadas(window, tentativas_de_letras):
-    letras = 'Letras tentadas: ' + ', '.join(tentativas_de_letras)
+    tentativas_filtradas = [letra for letra in tentativas_de_letras if letra not in [' ', '-']]
+    letras = 'Letras tentadas: ' + ', '.join(tentativas_filtradas)
     texto_tentativas = fonte_menor.render(letras, True, preto)
     window.blit(texto_tentativas, (20, 550))
+
+def Desenho_Tela_Game_Over(window, resposta, x, y, click, click_last_status):
+    if resposta == 'CRUZEIRO':
+        imagem_fundo = pg.image.load('imagens/cruzeiroperdeu.jpg')
+    if resposta == 'SANTOS':
+        imagem_fundo = pg.image.load('imagens/santosperdeu.jpeg')
+    if resposta == 'INTERNACIONAL':
+        imagem_fundo = pg.image.load('imagens/interperdeu.jpg')
+    if resposta == 'VASCO DA GAMA':
+        imagem_fundo = pg.image.load('imagens/vascoperdeu.jpg')
+    if resposta == 'ATLETICO MINEIRO':
+        imagem_fundo = pg.image.load('imagens/galoperdeu.jpg')
+    if resposta == 'FLAMENGO':
+        imagem_fundo = pg.image.load('imagens/flamengoperdeu.jpg')
+    if resposta == 'CORINTHIANS':
+        imagem_fundo = pg.image.load('imagens/corinthiansperdeu.jpg')
+    if resposta == 'GREMIO':
+        imagem_fundo = pg.image.load('imagens/gremioperdeu.jpg')
+    if resposta == 'PALMEIRAS':
+        imagem_fundo = pg.image.load('imagens/palmeirasperdeu.jpeg')
+    if resposta == 'SAO PAULO':
+        imagem_fundo = pg.image.load('imagens/saopauloperdeu.jpg')
+
+    imagem_fundo = pg.transform.scale(imagem_fundo, (1000, 600))
+    window.blit(imagem_fundo, (0, 0))
+
+    superficie_escura = pg.Surface((1000, 600))
+    superficie_escura.fill((0, 0, 0))
+    superficie_escura.set_alpha(150)
+    window.blit(superficie_escura, (0, 0))
+
+    texto_titulo = fonte_titulo.render("Você perdeu!", True, vermelho)
+    largura_texto_titulo = texto_titulo.get_width()
+    pos_x_titulo = (1000 - largura_texto_titulo) / 2
+    pos_y_titulo = 100
+    window.blit(texto_titulo, (pos_x_titulo, pos_y_titulo))
+
+    texto_resposta = fonte_rb.render(f"A resposta era: {resposta}", True, branco)
+    largura_texto_resposta = texto_resposta.get_width()
+    pos_x_resposta = (1000 - largura_texto_resposta) / 2
+    pos_y_resposta = 200
+    window.blit(texto_resposta, (pos_x_resposta, pos_y_resposta))
+
+    pg.draw.rect(window, cinza_claro, (50, 450, 300, 60))
+    pg.draw.rect(window, cinza_escuro, (50, 450, 300, 60), 5)
+    texto_voltar_menu = fonte_rb.render("Voltar ao Menu", True, branco)
+    largura_texto_voltar = texto_voltar_menu.get_width()
+    altura_texto_voltar = texto_voltar_menu.get_height()
+    pos_x_voltar = (50 + 300 / 2) - largura_texto_voltar / 2
+    pos_y_voltar = (450 + 60 / 2) - altura_texto_voltar / 2
+    window.blit(texto_voltar_menu, (pos_x_voltar, pos_y_voltar))
+
+    pg.draw.rect(window, verde, (650, 450, 300, 60))
+    pg.draw.rect(window, amarelo, (650, 450, 300, 60), 5)
+    texto_nova_rodada = fonte_rb.render("Nova Rodada", True, branco)
+    largura_texto_nova_rodada = texto_nova_rodada.get_width()
+    altura_texto_nova_rodada = texto_nova_rodada.get_height()
+    pos_x_nova_rodada = 650 + (300 / 2) - (largura_texto_nova_rodada / 2)
+    pos_y_nova_rodada = (450 + 60 / 2) - (altura_texto_nova_rodada / 2)
+    window.blit(texto_nova_rodada, (pos_x_nova_rodada, pos_y_nova_rodada))
+
+    voltar_menu = False
+    nova_rodada = False
+
+    if 50 <= x <= 350 and 450 <= y <= 510 and not click_last_status and click[0]:
+        voltar_menu = True
+
+    if 650 <= x <= 950 and 450 <= y <= 510 and not click_last_status and click[0]:
+        nova_rodada = True
+
+    return True, nova_rodada, voltar_menu
+
+def Desenho_Tela_Vitoria(window, resposta, x, y, click, click_last_status):
+    if resposta == 'CRUZEIRO':
+        imagem_fundo = pg.image.load('imagens/cruzeiroganhou.jpg')
+    if resposta == 'SANTOS':
+        imagem_fundo = pg.image.load('imagens/santosganhou.jpeg')
+    if resposta == 'INTERNACIONAL':
+        imagem_fundo = pg.image.load('imagens/interganhou.jpg')
+    if resposta == 'VASCO DA GAMA':
+        imagem_fundo = pg.image.load('imagens/vascoganhou.jpg')
+    if resposta == 'ATLETICO MINEIRO':
+        imagem_fundo = pg.image.load('imagens/galoganhou.jpg')
+    if resposta == 'FLAMENGO':
+        imagem_fundo = pg.image.load('imagens/flamengoganhou.jpeg')
+    if resposta == 'CORINTHIANS':
+        imagem_fundo = pg.image.load('imagens/corinthiansganhou.jpg')
+    if resposta == 'GREMIO':
+        imagem_fundo = pg.image.load('imagens/gremioganhou.jpg')
+    if resposta == 'PALMEIRAS':
+        imagem_fundo = pg.image.load('imagens/palmeirasganhou.jpeg')
+    if resposta == 'SAO PAULO':
+        imagem_fundo = pg.image.load('imagens/saopauloganhou.jpg')
+
+    imagem_fundo = pg.transform.scale(imagem_fundo, (1000, 600))
+    window.blit(imagem_fundo, (0, 0))
+
+    superficie_escura = pg.Surface((1000, 600))
+    superficie_escura.fill((0, 0, 0))
+    superficie_escura.set_alpha(150)
+    window.blit(superficie_escura, (0, 0))
+
+    texto_titulo = fonte_titulo.render("Você ganhou!", True, verde)
+    largura_texto_titulo = texto_titulo.get_width()
+    pos_x_titulo = (1000 - largura_texto_titulo) / 2
+    pos_y_titulo = 100
+    window.blit(texto_titulo, (pos_x_titulo, pos_y_titulo))
+
+    texto_resposta = fonte_rb.render(f"A resposta era: {resposta}", True, branco)
+    largura_texto_resposta = texto_resposta.get_width()
+    pos_x_resposta = (1000 - largura_texto_resposta) / 2
+    pos_y_resposta = 200
+    window.blit(texto_resposta, (pos_x_resposta, pos_y_resposta))
+
+    pg.draw.rect(window, cinza_claro, (50, 450, 300, 60))
+    pg.draw.rect(window, cinza_escuro, (50, 450, 300, 60), 5)
+    texto_voltar_menu = fonte_rb.render("Voltar ao Menu", True, branco)
+    largura_texto_voltar = texto_voltar_menu.get_width()
+    altura_texto_voltar = texto_voltar_menu.get_height()
+    pos_x_voltar = (50 + 300 / 2) - largura_texto_voltar / 2
+    pos_y_voltar = (450 + 60 / 2) - altura_texto_voltar / 2
+    window.blit(texto_voltar_menu, (pos_x_voltar, pos_y_voltar))
+
+    pg.draw.rect(window, verde, (650, 450, 300, 60))
+    pg.draw.rect(window, amarelo, (650, 450, 300, 60), 5)
+    texto_nova_rodada = fonte_rb.render("Nova Rodada", True, branco)
+    largura_texto_nova_rodada = texto_nova_rodada.get_width()
+    altura_texto_nova_rodada = texto_nova_rodada.get_height()
+    pos_x_nova_rodada = 650 + (300 / 2) - (largura_texto_nova_rodada / 2)
+    pos_y_nova_rodada = (450 + 60 / 2) - (altura_texto_nova_rodada / 2)
+    window.blit(texto_nova_rodada, (pos_x_nova_rodada, pos_y_nova_rodada))
+
+    voltar_menu = False
+    nova_rodada = False
+
+    if 50 <= x <= 350 and 450 <= y <= 510 and not click_last_status and click[0]:
+        voltar_menu = True
+
+    if 650 <= x <= 950 and 450 <= y <= 510 and not click_last_status and click[0]:
+        nova_rodada = True
+
+    return True, nova_rodada, voltar_menu
 
 while True:
     for event in pg.event.get():
@@ -371,9 +517,44 @@ while True:
                         ['CORINTHIANS', 'GREMIO', 'PALMEIRAS', 'SANTOS', 'SAO PAULO', 'VASCO DA GAMA'],
                         ['CORINTHIANS', 'CRUZEIRO', 'SÃO PAULO', 'VASCO DA GAMA'])
 
+        if palavra_camuflada == palavra_escolhida:
+            end_game = True
+            resposta = palavra_escolhida
+            game_victory, nova_rodada, voltar_menu = Desenho_Tela_Vitoria(window, resposta, x, y, click, click_last_status)
+
+            if nova_rodada:
+                pergunta, palavra_escolhida = Gerar_Pergunta()
+                pergunta_gerada = True
+                tentativas_de_letras = [' ', '-']
+                chance = 0
+                end_game = False
+
+            if voltar_menu:
+                jogo_iniciado = False
+                tentativas_de_letras = ['', '-']
+                chance = 0
+                pergunta_gerada = False
+
         end_game, chance, tentativas_de_letras, pergunta_gerada = Restart_do_Jogo(end_game, chance, tentativas_de_letras, click_last_status, click, x, y, pergunta_gerada)
 
         jogo_iniciado = Voltar_Ao_Menu(x, y, click, click_last_status, jogo_iniciado)
+
+    if chance == 6:
+        resposta = palavra_escolhida
+        game_over, nova_rodada, voltar_menu = Desenho_Tela_Game_Over(window, resposta, x, y, click, click_last_status)
+
+        if voltar_menu:
+            jogo_iniciado = False
+            tentativas_de_letras = ['', '-']
+            chance = 0
+            pergunta_gerada = False
+        
+        if nova_rodada:
+            pergunta, palavra_escolhida = Gerar_Pergunta()
+            pergunta_gerada = True
+            tentativas_de_letras = [' ', '-']
+            chance = 0
+            end_game = False
 
     click_last_status = click[0]
 
