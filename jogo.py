@@ -228,9 +228,9 @@ def Desenho_Conjuntos(window, A, B, C):
     texto_conjunto_B = f"B = [{', '.join(B)}]"
     texto_conjunto_C = f"C = [{', '.join(C)}]"
 
-    linhas_A = quebrar_texto(texto_conjunto_A, conjunto_box_width - 20, fonte_conjuntos)
-    linhas_B = quebrar_texto(texto_conjunto_B, conjunto_box_width - 90, fonte_conjuntos)
-    linhas_C = quebrar_texto(texto_conjunto_C, conjunto_box_width - 20, fonte_conjuntos)
+    linhas_A = quebrar_texto(texto_conjunto_A, conjunto_box_width - 60, fonte_conjuntos)
+    linhas_B = quebrar_texto(texto_conjunto_B, conjunto_box_width - 40, fonte_conjuntos)
+    linhas_C = quebrar_texto(texto_conjunto_C, conjunto_box_width - 80, fonte_conjuntos)
 
     margin_x = 20
     margin_y = 10
