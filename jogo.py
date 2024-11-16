@@ -27,7 +27,8 @@ pg.display.set_icon(icone)
 fonte_titulo = pg.font.SysFont("impact", 60)
 fonte_rb = pg.font.SysFont("comicsansms", 40)
 fonte_menor = pg.font.SysFont("comicsansms", 25)
-fonte_conjuntos = pg.font.SysFont("comicsansms", 18)
+fonte_conjuntos = pg.font.SysFont("comicsansms", 16)
+fonte_pequena = pg.font.SysFont("comicsansms", 25)
 
 # Listas de times de futebol que serão usadas nas perguntas
 A = ['ATLETICO MINEIRO', 'CRUZEIRO', 'FLAMENGO', 'INTERNACIONAL', 'VASCO DA GAMA']
@@ -193,7 +194,7 @@ def Voltar_Ao_Menu(x, y, click, click_last_status, jogo_iniciado):
 
 # Função para mostrar as perguntas
 def Mostrar_Pergunta(window, pergunta):
-    texto_pergunta = fonte_rb.render(pergunta, True, preto)
+    texto_pergunta = fonte_pequena.render(pergunta, True, preto)
     window.blit(texto_pergunta, (20, 20))
 
 # Função para desenhar o botão de restart
@@ -226,12 +227,17 @@ def quebrar_texto(texto, largura_maxima, fonte):
     
     return linhas
 
+# Função para desenhar texto
+def desenhar_texto(texto, pos_x, pos_y):
+    texto_renderizado = fonte_conjuntos(texto, True, branco)
+    window.blit(texto_renderizado, (pos_x, pos_y))
+
 # Função para desenhar os conjuntos
 def Desenho_Conjuntos(window, A, B, C):
-    conjunto_box_width = 390
-    conjunto_box_height = 240
+    conjunto_box_width = 340
+    conjunto_box_height = 300
 
-    pos_x = 600
+    pos_x = 650
     pos_y = 260
     pos_y_c = 0
     pos_y_a = 0
@@ -242,9 +248,9 @@ def Desenho_Conjuntos(window, A, B, C):
     conjunto_box.set_alpha(180)
     window.blit(conjunto_box, (pos_x, pos_y))
 
-    texto_conjunto_A = f"A = [{', '.join(A)}]"
-    texto_conjunto_B = f"B = [{', '.join(B)}]"
-    texto_conjunto_C = f"C = [{', '.join(C)}]"
+    texto_conjunto_A = f"Foram bem no Brasileirão: A = [{', '.join(A)}]"
+    texto_conjunto_B = f"Foram bem na Copa do Brasil: B = [{', '.join(B)}]"
+    texto_conjunto_C = f"Forma bem na Libertadores: C = [{', '.join(C)}]"
 
     linhas_A = quebrar_texto(texto_conjunto_A, conjunto_box_width - 60, fonte_conjuntos)
     linhas_B = quebrar_texto(texto_conjunto_B, conjunto_box_width - 40, fonte_conjuntos)
@@ -271,12 +277,12 @@ def Desenho_Conjuntos(window, A, B, C):
 
 
     pos_y_offset += total_linhas_A * gap_between_lines + espacamento_entre_conjuntos
-    pos_y_b = 353
+    pos_y_b = 370
     for i, linha in enumerate(linhas_B):
         window.blit(fonte_conjuntos.render(linha, True, preto), (pos_x + margin_x, pos_y_b + i * gap_between_lines))
 
     pos_y_offset += total_linhas_B * gap_between_lines + espacamento_entre_conjuntos
-    pos_y_c += 440
+    pos_y_c += 475
     for i, linha in enumerate(linhas_C):
         window.blit(fonte_conjuntos.render(linha, True, preto), (pos_x + margin_x, pos_y_c + i * gap_between_lines))
 
@@ -288,16 +294,16 @@ def Desenho_Conjuntos(window, A, B, C):
 # Função para gerar as perguntas e respostas
 def Gerar_Pergunta():
     perguntas = [
-        ("O time x pertence a A e B", list(set(A) & set(B))),
-        ("O time x pertence a A mas não a B", list(set(A) - set(B))),
-        ("O time x pertence a B mas não a A", list(set(B) - set(A))),
-        ("O time x pertence a A e C", list(set(A) & set(C))),
-        ("O time x pertence a A, B e C", list(set(A) & set(B) & set(C))),
-        ("O time x pertence a B mas não a C", list(set(B) - set(C))),
-        ("O time x pertence a B ou C, mas não a A", list((set(B) | set(C)) - set(A))),
-        ("O time x não pertence a B", list((set(A) | set(C)) - set(B))),
-        ("O time x não pertence a A nem a B", list(set(C) - set(A) - set(B))),
-        ("O time x não pertence a B nem a C", list(set(A) - set(B) - set(C))),
+        ("Qual time foi bem no Brasileirão e na Copa do Brasil?", list(set(A) & set(B))),
+        ("Qual time foi bem no Brasileirão, mas não na Copa do Brasil?", list(set(A) - set(B))),
+        ("Qual time foi bem na Copa do Brasil, mas não no Brasileirão?", list(set(B) - set(A))),
+        ("Qual time foi bem no Brasileirão e na Libertadores?", list(set(A) & set(C))),
+        ("Qual time foi bem no Brasileirão, na Copa do Brasil e na Libertadores?", list(set(A) & set(B) & set(C))),
+        ("Qual time foi bem na Copa do Brasil, mas não na Libertadores?", list(set(B) - set(C))),
+        ("Qual time foi bem na Copa do Brasil ou Libertadores, mas não no Brasileirão?", list((set(B) | set(C)) - set(A))),
+        ("Qual time não foi bem na Copa do Brasil?", list((set(A) | set(C)) - set(B))),
+        ("Qual time não foi bem no Brasileirão e na Libertadores?", list(set(B) - set(A) - set(C))),
+        ("Qual time não foi bem na Copa do Brasil e na Libertadores?", list(set(A) - set(B) - set(C))),
     ]
 
     pergunta, resposta = random.choice(perguntas)
@@ -539,7 +545,7 @@ while True:
         palavra_camuflada = Camuflando_Palavra(palavra_escolhida, tentativas_de_letras)
         Palavra_do_Jogo(window, palavra_camuflada)
 
-        Desenho_Conjuntos(window, 
+        Desenho_Conjuntos(window,
                         ['ATLETICO MINEIRO', 'CRUZEIRO', 'FLAMENGO', 'INTERNACIONAL', 'VASCO DA GAMA'],
                         ['CORINTHIANS', 'GREMIO', 'PALMEIRAS', 'SANTOS', 'SAO PAULO', 'VASCO DA GAMA'],
                         ['CORINTHIANS', 'CRUZEIRO', 'SÃO PAULO', 'VASCO DA GAMA'])
